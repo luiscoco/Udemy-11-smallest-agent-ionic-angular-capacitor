@@ -1,0 +1,21 @@
+{
+  "name": "smallest-agent-ionic-course",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "dev": "concurrently --kill-others --names API,IONIC \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "node scripts/run-backend.mjs",
+    "dev:web": "npm --prefix frontend start",
+    "generate:lesson": "node scripts/generate-lesson.mjs",
+    "typecheck": "npm --prefix frontend run typecheck",
+    "test": "npm --prefix frontend test && node scripts/run-backend.mjs --test",
+    "build": "npm run generate:lesson && npm --prefix frontend run build",
+    "cap:sync": "npm --prefix frontend run cap:sync",
+    "cap:android": "npm --prefix frontend run cap:android",
+    "cap:ios": "npm --prefix frontend run cap:ios"
+  },
+  "devDependencies": {
+    "concurrently": "10.0.7"
+  }
+}

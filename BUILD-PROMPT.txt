@@ -1,0 +1,84 @@
+You are working in an EMPTY folder. Create a complete, independently runnable educational application from scratch: The Smallest Agent, Lesson 0, Ionic + Angular + Capacitor + FastAPI + Python edition.
+
+Create a new folder named 11-smallest-agent-ionic-angular-capacitor. Preserve every earlier application and prompt. Save this standalone specification beside the root prompts as Prompt - Create the Enterprise Web Application from Scratch - Ionic Angular Capacitor FastAPI Python.txt and an identical BUILD-PROMPT.txt inside the new folder. Never read, display, copy or borrow another application's real environment file or credentials. Create only backend/.env.example and never overwrite a real .env.
+
+STACK AND RUNTIME
+- Genuine Ionic 9 components with Angular 22 standalone components, strict TypeScript/templates, Angular Router and Angular's production application builder. Verify current compatible versions and official migration notes first. Ionic 9 standalone components and provideIonicAngular import from @ionic/angular; do not use obsolete integration APIs.
+- Capacitor 8 packages the actual Angular production output for Android/iOS. Include matching core, CLI and native platform versions, a correct webDir and real Clipboard, Preferences, Filesystem and Share integrations. Generate/synchronize platform projects using Capacitor CLI. Do not invent native platform directories or claim a signed/native runtime build without performing it.
+- Python FastAPI runs the actual Python Claude Agent SDK: query(prompt, options) -> async for -> ResultMessage. Keep the recognizable smallest-agent loop. No direct REST replacement, fake inference, JavaScript SDK backend or client-side key.
+- Node.js 24 LTS and Python 3.12+ with an independent root .venv. Pin the primary Python packages and compatible frontend packages and commit root/frontend lockfiles. Baseline verified versions: Ionic 9.0.10, Angular 22.2.5 / builder 22.2.6, Capacitor 8.6.0, TypeScript 6.0.3, Python Agent SDK 0.2.179 and FastAPI 0.162.2. Prefer verified compatibility over arbitrary version bumps.
+
+STRUCTURE AND WINDOWS LAUNCH
+- Root package.json supplies setup, dev, dev:api, dev:web, generate:lesson, typecheck, test, build, cap:sync, cap:android and cap:ios. Root npm run dev starts both servers and stops both with Ctrl+C. Avoid nested-folder guessing.
+- frontend contains Angular/Ionic source, package.json and lockfile, angular.json, strict tsconfigs, Capacitor config, Ionic config and public assets. Angular outputs frontend/dist/browser; Capacitor webDir must match that exact directory.
+- backend contains run.py, app/config.py, schemas.py, agent_service.py, main.py, requirements and tests. Load only backend/.env relative to the module, with process-environment precedence. Use Windows Proactor event-loop support for SDK subprocesses. Resolve the Python executable relative to this edition, never another application's .venv.
+- Root setup creates .venv and installs both stacks. Root Start-Application.ps1 resolves PSScriptRoot. README includes exact PowerShell commands starting from Lesson 0, npm install, npm run setup, guarded example copy, edit key, npm run dev, web URL and stopping commands. Also provide separate-terminal and explicit Python alternatives with their working directories.
+- Browser frontend runs on localhost:5200; FastAPI on 127.0.0.1:8600. After build, FastAPI can serve the compiled web frontend with lesson deep-link fallback. API/docs routes take precedence; unknown /api routes remain 404.
+- Include real FastAPI Swagger /docs and /openapi.json. Include README.md, ASSETS.md, VERIFICATION.md, BUILD-PROMPT.txt and .gitignore. Ignore real environment variants, environments, dependencies, caches, compiled output and native machine-specific build files.
+
+DESIGN: CARRY FORWARD ALL PREVIOUS REQUESTS
+Reference https://github.com/luiscoco/Udemy-Claude-Agent-SDK-lesson01-app for the course style. Copy only individually identified safe public assets/source files, never directories containing keys. Record the astronaut's upstream provenance.
+
+Use large readable typography around 21 px body, secondary text at least 16 px and code 18 px; spacious line heights, strong headings and accessible focus. Use pastel blue input, mint answer, lilac SDK inspector and alternating peach/blue/mint/lilac lesson cards, rounded corners and fine borders. Persistent light/dark theme uses Capacitor Preferences with unavailable-storage fallback. Provide responsive narrow-screen layouts, no horizontal page overflow, 44 px targets, real labels, active navigation, keyboard support and reduced motion.
+
+Use actual Ionic header/toolbar/content/cards/buttons/textarea/badges/toast controls. Angular Router and Ionic's router outlet must navigate all five sections. Keep state in an injectable service with signals so prompts, modes, answers and messages survive tab changes. Test navigation on the same mounted application rather than only loading routes independently.
+
+Color and format all code snippets with accurate language and source filename, indentation, safe escaped unknown-language fallback, copy action and bounded horizontal scrolling. Use Highlight.js or equivalent for Python, TypeScript, JSON, PowerShell and HTML. Render model Markdown safely with colored fences, DOMPurify and Angular sanitization; suppress remote images and allow only HTTP(S) links. Do not insert untrusted unsanitized HTML or misuse bypassSecurityTrustHtml.
+
+FIVE COMPLETE SECTIONS
+1. Agent lab: course header/astronaut/stack context, server/key-presence status, theme and API docs; Hello-world default prompt, examples, trimmed 1–4000 counter; Stream/Simple, immediate synchronous duplicate lock, disabled busy controls, cancel, elapsed indicator and Ctrl+Enter. Show real final answer, turns, duration, estimated USD cost (null means unavailable) and error flag. Copy and Markdown browser-download/native-share. Timestamped safe SDK event timeline with expandable syntax-colored JSON; cap display at 500 rows while continuing final-result processing. Implement idle/loading/success/error, safe specific errors and accessible Ionic toast. No fabricated seeded answers.
+2. What you will learn: at least six meaningful cards on Ionic/Angular/Capacitor, Python SDK loop, server credentials, streaming, tool isolation and safe final rendering.
+3. How to run: exact Windows commands, configuration/precedence/restart guidance, public API URL versus private key, checks/builds/docs, physical-device/emulator networking and native packaging instructions. Explain that health reports presence rather than authentication or billing readiness.
+4. Architecture & workflow: a real local UML sequence diagram, not a list of boxes. Five participant lifelines: Student/Device, Ionic Angular client, FastAPI, Python Agent SDK/CLI and Claude API. Include call/return arrows, a message loop and success/provider-failure/input-key alternatives, with downloadable SVG and editable PlantUML. Bounded horizontal scrolling on phones.
+5. Code walkthrough: at least five syntax-colored actual source excerpts with filenames and useful explanation, covering the Angular input/transport, FastAPI validation/delegation, Python SDK iteration/result and safe answer presentation. No unrelated-stack code or pseudocode presented as implemented source.
+
+UML SOURCE EXPLANATIONS AND SVG CORRECTNESS
+Exactly 16 numbered interactions, each with a matching numbered pastel explanation card containing title, source filename, formatted colored real excerpt and plain explanation:
+1 submit prompt; 2 POST stream; 3 validate input/options; 4 server delegation; 5 SDK/provider call boundary; 6 response observation via SDK iterator; 7 safe projection; 8 SSE frame; 9 Angular state update; 10 normalize final result/metrics; 11 ResultMessage dispatch; 12 safe answer and metrics; 13 require done; 14 safe SSE error without done; 15 inline error and notice; 16 missing-key/input rejection before SDK work.
+
+Generate excerpts from actual files using stable markers, tolerating formatter line breaks while rejecting missing markers or mismatched counts/titles. All SVG and PlantUML labels must match the cards. Explain that provider transport is internal to the SDK; show the real application query/iterator boundary rather than inventing an application HTTP request to Claude.
+
+SVG must use explicit fill, stroke, stroke-width, stroke-dasharray, marker-end and font presentation attributes. Do not rely on embedded CSS classes: renderers such as SvgXml may ignore them, producing black frames and invisible arrows. Alternative frames explicitly use fill="none". Generate embedded/download assets from the same template. Verify actual arrow/lifeline/frame/text styles and inspect a focused diagram screenshot; merely finding an SVG or img element is insufficient. Build regenerates lesson assets deterministically.
+
+PRIVATE/PUBLIC CONFIGURATION
+backend/.env.example:
+ANTHROPIC_API_KEY=sk-ant-replace-with-your-key
+CLAUDE_MODEL=
+AGENT_SYSTEM_PROMPT=You are a concise teaching assistant.
+AGENT_MAX_TURNS=1
+API_HOST=127.0.0.1
+API_PORT=8600
+ALLOWED_ORIGINS=http://localhost:5200,http://127.0.0.1:5200,capacitor://localhost,https://localhost
+
+Empty model uses SDK default; override availability depends on the user's account. Turns default 1 and accept integers 1–10. Placeholder counts as missing. Never log or echo credential values.
+
+frontend/public/config.json contains only {"apiUrl":"http://127.0.0.1:8600"}. It is public and included in native/web assets; no credential belongs there. Document that it must be rebuilt and synchronized after changes. There is no frontend secret .env.
+
+SERVER BOUNDARIES AND LIFECYCLE
+- GET /api/health returns status and api_key_configured only. POST /api/agent/query accepts JSON {prompt} and returns result, num_turns, duration_ms, total_cost_usd and is_error. POST /api/agent/stream emits UTF-8 SSE message events then done; failures emit error without done.
+- Validate actual bytes at 32 KiB, media type, JSON syntax and strict trimmed string length 1–4000 before SDK execution. Safe 400/415/413/403/422 responses never echo input. Allow only exact configured browser/native Origins including protocol/port; ignore forwarded headers. Native clients can omit Origin; CORS is not authentication.
+- Missing key gives query 503 or SSE error; provider failure gives query 502 or safe SSE error. Invalid/missing-key paths never call SDK. Do not expose raw provider exceptions, environment, filesystem paths or user content in errors.
+- Disable built-in tools with tools=[] and also allowed_tools=[], permission_mode=dontAsk, empty settings/skills/plugins/MCP, strict MCP, no persisted sessions and bounded max_turns. Clearing allowed_tools alone is not a tool ban. Disable remote Claude.ai MCP and pass the private key through this run's options without process-wide mutation.
+- Allowlist projected text, subtype and final metrics; exclude thinking, tool arguments, raw SDK/config, paths and session identifiers. Redact exact key occurrences before truncation. Non-success subtypes remain failures even when is_error=false. done never overrides an error result.
+- Use async iterator closing, disconnect cancellation, three-minute deadlines and heartbeat comments. Cleanup timers/readers/tasks and SDK iterators on failure or cancellation. Require final result before done.
+- The client validates response contracts, handles split UTF-8, CRLF, comments, partial/multiple frames and multiline data, requires final result plus done, cancels readers on errors and displays specific safe HTTP details. Use browser/WebView fetch streaming; keep CapacitorHttp interception disabled because it can buffer SSE.
+
+NATIVE PACKAGING AND NETWORKING
+Use Capacitor CLI to generate and sync native projects from the actual web build. Include platform packages/configuration and native plugin usage, not only Capacitor branding. Browser exports download files; native exports write cache files then invoke Share. Native clipboard and Preferences have browser fallbacks. Review/include the appropriate Apple privacy manifest declarations for Filesystem file timestamps and Preferences user defaults before distribution.
+
+A physical phone cannot reach the PC through its own localhost. Explain API_HOST=0.0.0.0, the PC's LAN IP, same network/firewall, Android emulator 10.0.2.2, exact native/browser Origins and public HTTPS API deployment. HTTPS WebViews and ATS/Android policies can block local HTTP; prefer HTTPS or development-only transport exceptions (Android server.cleartext plus android.allowMixedContent, or a local-network ATS exception), then rebuild/sync. Do not configure a production server.url pointing to a laptop. Local iOS compilation requires macOS/Xcode; Android requires Android Studio/JDK/SDK versions compatible with Capacitor 8. Do not automatically launch IDEs, sign apps, submit stores or deploy.
+
+VERIFICATION AND HANDOFF
+Run Angular strict template/type checks, meaningful mocked Python SDK/ASGI tests and frontend SSE parser tests. Cover input/body/media/Origin rejection, missing key, options, redaction, safe failures, absent final result, non-success subtype and iterator/request cancellation. Generate assets deterministically and build the actual production Angular application, then generate/sync Capacitor projects with honest platform limits.
+
+Use real HTTP for FastAPI health/docs/schema/validation/no-key behavior and compiled web assets/deep links. Use a real browser for all five tab clicks on one reused application, active navigation, prompt/answer retention, code colors, all 16 source explanations, diagram appearance, theme, desktop/mobile overflow and both request modes. Use explicit fixtures for success/error results and the 500-row display cap without paid inference. Do not claim native device/emulator or live Claude testing unless performed. Record exact checks and limitations in VERIFICATION.md, stop only owned test servers and preserve existing work. Deliver the new folder and matching prompt with concise Windows run commands.
+
+Official references:
+https://ionicframework.com/docs/angular/build-options
+https://ionicframework.com/docs/angular/navigation
+https://capacitorjs.com/docs/getting-started
+https://capacitorjs.com/docs/config
+https://capacitorjs.com/docs/apis/filesystem
+https://capacitorjs.com/docs/apis/preferences
+https://fastapi.tiangolo.com/
+https://code.claude.com/docs/en/agent-sdk/python

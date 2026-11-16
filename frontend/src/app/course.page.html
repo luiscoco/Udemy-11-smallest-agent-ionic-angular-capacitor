@@ -1,0 +1,350 @@
+<ion-header class="ion-no-border"
+  ><ion-toolbar
+    ><div class="topbar">
+      <div>
+        <strong>◈ COCO / AGENT ACADEMY</strong
+        ><small>LESSON 0 · IONIC EDITION</small>
+      </div>
+      <ion-button fill="outline" (click)="state.toggleTheme()"
+        >{{state.dark()?'Light mode':'Dark mode'}}</ion-button
+      >
+    </div></ion-toolbar
+  ></ion-header
+>
+<ion-content
+  ><main class="course">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">BUILD IT. RUN IT. UNDERSTAND IT.</p>
+        <h1>The smallest agent.<br />One app. Three platforms.</h1>
+        <p>
+          One prompt, one Python agent, one clear answer. Learn the Claude Agent
+          SDK with Ionic, Angular, Capacitor and FastAPI.
+        </p>
+        <div class="stack">
+          <ion-badge>Ionic 9</ion-badge><ion-badge>Angular 22</ion-badge
+          ><ion-badge>Capacitor 8</ion-badge
+          ><ion-badge>FastAPI + Python</ion-badge>
+        </div>
+      </div>
+      <img
+        src="assets/astronaut.png"
+        alt="Course astronaut"
+        width="230"
+        height="230"
+      />
+    </header>
+    <nav aria-label="Lesson sections" class="lesson-nav">
+      @for(tab of tabs;track tab.key){<ion-button
+        [routerLink]="tab.path"
+        [fill]="section===tab.key?'solid':'outline'"
+        [attr.aria-current]="section===tab.key?'page':null"
+        [attr.data-section]="tab.key"
+        >{{tab.label}}</ion-button
+      >}
+    </nav>
+    @switch(section){ @case('lab'){
+    <div class="lab-grid">
+      <div>
+        <ion-card class="blue"
+          ><ion-card-content
+            ><p class="eyebrow">01 / INPUT</p>
+            <h2>Give your agent a mission</h2>
+            <p class="secondary">
+              Start small. Ask a question and follow the SDK messages back to
+              the answer.
+            </p>
+            <ion-textarea
+              label="Your prompt"
+              labelPlacement="stacked"
+              fill="outline"
+              aria-label="Your prompt"
+              [rows]="5"
+              [autoGrow]="true"
+              [ngModel]="state.prompt()"
+              (ngModelChange)="state.prompt.set($event)"
+              [disabled]="state.status()==='loading'"
+              placeholder="What would you like to ask?"
+            />
+            <p class="secondary">
+              {{state.prompt().trim().length}} / 4000 characters ·
+              {{state.health()}}
+            </p>
+            <div class="actions">
+              @for(example of examples;track example){<ion-button
+                fill="outline"
+                size="small"
+                [disabled]="state.status()==='loading'"
+                (click)="state.prompt.set(example)"
+                >{{example}}</ion-button
+              >}
+            </div>
+            <div class="actions">
+              <ion-button
+                [fill]="state.mode()==='stream'?'solid':'outline'"
+                [disabled]="state.status()==='loading'"
+                (click)="state.mode.set('stream')"
+                >Stream</ion-button
+              ><ion-button
+                [fill]="state.mode()==='simple'?'solid':'outline'"
+                [disabled]="state.status()==='loading'"
+                (click)="state.mode.set('simple')"
+                >Simple</ion-button
+              ><ion-button
+                [disabled]="state.status()==='loading'||!state.prompt().trim()||state.prompt().trim().length>4000"
+                (click)="state.run()"
+                >{{state.status()==='loading'?'Running…':'Run agent
+                ↗'}}</ion-button
+              >@if(state.status()==='loading'){<ion-button
+                fill="outline"
+                (click)="state.cancel()"
+                >Cancel</ion-button
+              >}
+            </div>
+            <p class="secondary">
+              {{state.status()}} · {{state.elapsed().toFixed(1)}}s · Ctrl +
+              Enter
+            </p>
+            <p class="secondary">
+              Submitting a prompt may use API credits. The Claude key stays on
+              the server.
+            </p>
+          </ion-card-content></ion-card
+        >
+        <ion-card class="mint"
+          ><ion-card-content
+            ><p class="eyebrow">02 / OUTPUT</p>
+            <h2>Your agent’s answer</h2>
+            @if(state.error()){
+            <p role="alert" class="error">{{state.error()}}</p>
+            } @if(state.result();as result){<app-answer
+              [text]="result.result"
+            />
+            <p class="secondary">
+              {{result.num_turns}} turn(s) · {{result.duration_ms}} ms ·
+              {{result.total_cost_usd===null?'Cost unavailable':'Estimated
+              $'+result.total_cost_usd.toFixed(5)}} ·
+              {{result.is_error?'error':'success'}}
+            </p>
+            <div class="actions">
+              <ion-button fill="outline" (click)="copy()"
+                >Copy answer</ion-button
+              ><ion-button fill="outline" (click)="download()"
+                >Save Markdown</ion-button
+              >
+            </div>
+            } @else{
+            <p class="secondary">
+              {{state.status()==='loading'?'Your agent is working. Watch the SDK
+              timeline.':'Your answer will appear here after you run the
+              agent.'}}
+            </p>
+            }
+          </ion-card-content></ion-card
+        >
+      </div>
+      <aside>
+        <ion-card class="lilac"
+          ><ion-card-content
+            ><p class="eyebrow">LIVE / SDK MESSAGES</p>
+            <h2>Follow the conversation</h2>
+            <p class="secondary">
+              Real SDK events, projected safely. Expand a row to inspect its
+              JSON.
+            </p>
+            @if(!state.messages().length){
+            <p class="secondary">Waiting for your first mission…</p>
+            } @for(message of state.messages();track $index){
+            <details class="message">
+              <summary>
+                <ion-badge>{{message.type}}</ion-badge
+                ><span
+                  >{{message.elapsed.toFixed(1)}}s · {{message.summary}}</span
+                >
+              </summary>
+              <app-code
+                [code]="json(message.data)"
+                language="json"
+                label="Safe SDK event"
+              />
+            </details>
+            } @if(state.messages().length>=500){
+            <p class="secondary">
+              Timeline display capped at 500 rows. Final results continue to be
+              processed.
+            </p>
+            }
+          </ion-card-content></ion-card
+        >
+      </aside>
+    </div>
+    <ion-card class="peach"
+      ><ion-card-content
+        ><h2>The same agent, with a mobile application around it.</h2>
+        <p>
+          Prompt → Ionic Angular client → FastAPI → Python Claude Agent SDK →
+          Claude. Capacitor adds native clipboard, preferences and sharing
+          around the same web application.
+        </p>
+        <ion-button routerLink="/architecture" fill="outline"
+          >Explore the architecture</ion-button
+        ><a [href]="state.apiUrl()+'/docs'" target="_blank" rel="noopener"
+          >Open API documentation ↗</a
+        ></ion-card-content
+      ></ion-card
+    >
+    } @case('learn'){
+    <h2>What you will learn</h2>
+    <div class="teaching-grid">
+      @for(topic of topics;track topic[0]){<ion-card
+        [class]="['blue','mint','lilac','peach'][$index%4]"
+        ><ion-card-content
+          ><h3>{{topic[0]}}</h3>
+          <p>{{topic[1]}}</p></ion-card-content
+        ></ion-card
+      >}
+    </div>
+    } @case('run'){
+    <h2>Run it on Windows</h2>
+    <ion-card class="blue"
+      ><ion-card-content
+        ><h3>1. Install and start</h3>
+        <p>
+          Use Node.js 24 LTS and Python 3.12 or newer. Start in Lesson 0 and
+          keep the terminal in this new application folder. Setup creates an
+          independent .venv and installs both stacks.
+        </p>
+        <app-code
+          [code]="setup"
+          language="powershell"
+          label="Windows PowerShell"
+        />
+        <p>
+          Open <a href="http://localhost:5200">http://localhost:5200</a>. The
+          API runs on port 8600. Stop both with Ctrl+C. You can also use dev:api
+          and dev:web in separate terminals.
+        </p></ion-card-content
+      ></ion-card
+    >
+    <ion-card class="mint"
+      ><ion-card-content
+        ><h3>2. Configure the private backend</h3>
+        <app-code
+          [code]="config"
+          language="powershell"
+          label="backend/.env · edit locally" />
+        <p>
+          Replace the placeholder with your Anthropic API key. Leave
+          CLAUDE_MODEL empty for the SDK default. Turns accept integers 1–10.
+          Process environment overrides this backend’s file. Restart FastAPI
+          after editing; health reports key presence rather than authenticated
+          readiness.
+        </p>
+        <p>
+          The frontend has no secret .env. Its public
+          <code>frontend/public/config.json</code> contains only an API URL:
+        </p>
+        <app-code
+          code='{"apiUrl":"http://127.0.0.1:8600"}'
+          language="json"
+          label="Public config.json" /></ion-card-content
+    ></ion-card>
+    <ion-card class="lilac"
+      ><ion-card-content
+        ><h3>3. Package with Capacitor</h3>
+        <app-code [code]="native" language="powershell" />
+        <p>
+          Capacitor packages the Angular production build. Android needs Android
+          Studio, its SDK and the JDK required by Capacitor 8. iOS compilation
+          needs macOS and Xcode. Opening native IDEs is an explicit command; no
+          store upload or signing is performed automatically.
+        </p>
+        <p>
+          A phone’s localhost points to the phone. Set API_HOST=0.0.0.0 and use
+          your PC’s LAN IP in public config.json, or use an HTTPS development
+          API. An Android emulator can use http://10.0.2.2:8600. HTTPS
+          pages/native WebViews may block an HTTP API; use HTTPS, or a narrowly
+          scoped development transport exception. Rebuild and sync after
+          changing config.json. Allow the matching Capacitor/browser origin and
+          local firewall ports.
+        </p></ion-card-content
+      ></ion-card
+    >
+    <ion-card class="peach"
+      ><ion-card-content
+        ><h3>4. Verify and build</h3>
+        <app-code [code]="checks" language="powershell" />
+        <p>
+          Use FastAPI’s served frontend for a single-server web preview. Keep
+          browser/native configuration public, use HTTPS and add authentication
+          and cost/rate limits before exposing the paid-inference API publicly.
+          CORS is not authentication.
+        </p></ion-card-content
+      ></ion-card
+    >
+    } @case('architecture'){
+    <h2>UML architecture & workflow</h2>
+    <ion-card class="blue"
+      ><ion-card-content
+        ><p>
+          Five lifelines, sixteen interactions. The SDK owns the model
+          transport; the source cards show the real query/iterator boundary.
+          Scroll horizontally to read the whole diagram on a narrow screen.
+        </p>
+        <div
+          class="diagram-scroll"
+          tabindex="0"
+          aria-label="Scrollable UML workflow"
+        >
+          <img
+            src="assets/workflow.svg"
+            alt="UML sequence diagram with five lifelines and sixteen numbered interactions"
+            width="1440"
+            height="1660"
+          />
+        </div>
+        <div class="actions">
+          <ion-button fill="outline" (click)="diagram('svg')"
+            >Save UML SVG</ion-button
+          ><ion-button fill="outline" (click)="diagram('puml')"
+            >Save PlantUML</ion-button
+          >
+        </div></ion-card-content
+      ></ion-card
+    >
+    @for(step of steps;track step.number){<ion-card
+      [class]="['blue','mint','lilac','peach'][$index%4]"
+      ><ion-card-content
+        ><h3>{{step.number}}. {{step.title}}</h3>
+        <p>{{step.text}}</p>
+        <app-code
+          [code]="step.code"
+          [language]="step.language"
+          [label]="step.source"
+        />
+        <p class="secondary">{{step.explanation}}</p></ion-card-content
+      ></ion-card
+    >} } @case('walkthrough'){
+    <h2>Code walkthrough</h2>
+    <p>
+      Follow five actual source excerpts, from Angular input through the Python
+      SDK loop and back to safe presentation.
+    </p>
+    @for(step of walkthrough;track step.number){<ion-card
+      [class]="$index%2?'mint':'blue'"
+      ><ion-card-content
+        ><h3>{{step.title}}</h3>
+        <p>{{step.text}}</p>
+        <app-code
+          [code]="step.code"
+          [language]="step.language"
+          [label]="step.source"
+        />
+        <p class="secondary">{{step.explanation}}</p></ion-card-content
+      ></ion-card
+    >} } }
+    <footer>
+      THE SMALLEST AGENT · LESSON 0 · Ionic + Angular + Capacitor + FastAPI
+    </footer>
+  </main></ion-content
+>

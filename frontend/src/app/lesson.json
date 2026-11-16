@@ -1,0 +1,146 @@
+[
+  {
+    "number": 1,
+    "title": "Run agent (prompt)",
+    "source": "frontend/src/app/lab-state.ts",
+    "language": "typescript",
+    "text": "Trim the Angular form input and lock immediately.",
+    "explanation": "An injectable singleton owns signals across all five routed Ionic pages. The synchronous lock applies before any await; the server repeats validation.",
+    "code": "const trimmed = this.prompt().trim();\nif (this.locked || !trimmed || trimmed.length > 4000) return;\nthis.locked = true;\nthis.status.set(\"loading\");\nthis.error.set(\"\");\nthis.result.set(null);\nthis.messages.set([]);\nthis.elapsed.set(0);\nconst active = new AbortController();\nthis.controller = active;\nconst started = performance.now();\nconst timer = setInterval("
+  },
+  {
+    "number": 2,
+    "title": "POST /api/agent/stream",
+    "source": "frontend/src/app/api.ts",
+    "language": "typescript",
+    "text": "POST JSON from the Ionic WebView or browser.",
+    "explanation": "The public API URL comes from config.json. Browser fetch streams remain enabled; CapacitorHttp interception is disabled to avoid buffering SSE.",
+    "code": "const response = await fetch(base + \"/api/agent/stream\", {\n  method: \"POST\",\n  headers: { \"Content-Type\": \"application/json\" },\n  body: JSON.stringify({ prompt }),\n  signal,\n});\nif (!response.ok) {\n  const data: unknown = await response.json().catch(() => null);\n  throw new Error(\n    detail(\n      data,\n      `The API could not start the stream (HTTP ${response.status}). Check the server and prompt.`,"
+  },
+  {
+    "number": 3,
+    "title": "Validate; tools disabled",
+    "source": "backend/app/schemas.py",
+    "language": "python",
+    "text": "Validate the prompt before inference.",
+    "explanation": "Strict Pydantic strings are trimmed, bounded to 1–4000 characters and reject extra fields. ASGI middleware also bounds actual bytes, media type and Origin.",
+    "code": "class PromptRequest(BaseModel):\n    model_config = ConfigDict(str_strip_whitespace=True, extra='forbid')\n    prompt: str = Field(min_length=1, max_length=4000, strict=True)\n\n"
+  },
+  {
+    "number": 4,
+    "title": "streamAgent() / query()",
+    "source": "backend/app/main.py",
+    "language": "python",
+    "text": "Delegate a real FastAPI route to the Python service.",
+    "explanation": "FastAPI returns native ServerSentEvent objects. A missing key exits before the query iterator is created. Invalid input fails before SSE headers.",
+    "code": "async def stream(body: PromptRequest):\n    if not settings.api_key_configured:\n        yield ServerSentEvent(event='error', data={'detail': MISSING_KEY})\n        return\n    try:\n        async with asyncio.timeout(180):\n            async with aclosing(agent.stream_agent(body.prompt)) as messages:\n                async for message in messages:\n                    yield ServerSentEvent(event='message', data=message)\n            yield ServerSentEvent(event='done', data={'status': 'complete'})\n    except Exception:\n        yield ServerSentEvent(event='error', data={'detail': FAILURE})\n"
+  },
+  {
+    "number": 5,
+    "title": "Prompt; no built-in tools",
+    "source": "backend/app/agent_service.py",
+    "language": "python",
+    "text": "Invoke the actual Python Claude Agent SDK.",
+    "explanation": "The SDK owns the CLI runtime and Claude transport. This excerpt is the application boundary initiating that exchange, rather than a fabricated HTTP implementation.",
+    "code": "    source = self.query_fn(prompt=prompt, options=self.agent_options())\n    async with aclosing(source):\n        async for message in source:\n            if isinstance(message, ResultMessage):\n                return self.result_data(message)\n    raise RuntimeError('Agent ended without a final result')\n\nasync def stream_agent(self, prompt: str):"
+  },
+  {
+    "number": 6,
+    "title": "Model response",
+    "source": "backend/app/agent_service.py",
+    "language": "python",
+    "text": "Observe the SDK async iterator.",
+    "explanation": "The model exchange returns through SDK messages. ResultMessage supplies the final answer; contextlib.aclosing closes the iterator on success, failure and cancellation.",
+    "code": "        async for message in source:\n            if isinstance(message, ResultMessage):\n                return self.result_data(message)\n    raise RuntimeError('Agent ended without a final result')\n\nasync def stream_agent(self, prompt: str):\n    source = self.query_fn(prompt=prompt, options=self.agent_options())"
+  },
+  {
+    "number": 7,
+    "title": "Safe SDK message",
+    "source": "backend/app/agent_service.py",
+    "language": "python",
+    "text": "Project only safe SDK fields.",
+    "explanation": "Text, subtype and normalized result fields are allowlisted. Thinking, environment, paths, tool inputs and session IDs do not enter public messages; exact key occurrences are redacted.",
+    "code": "        yield {'type': kind, 'summary': summary, 'data': data}\nif not found_result:\n    raise RuntimeError('Agent ended without a final result')"
+  },
+  {
+    "number": 8,
+    "title": "SSE message event",
+    "source": "backend/app/main.py",
+    "language": "python",
+    "text": "Encode real UTF-8 SSE events.",
+    "explanation": "FastAPI supplies event framing and heartbeat comments. Disconnect cancellation closes the stream; the three-minute timeout emits a safe error without done.",
+    "code": "                    yield ServerSentEvent(event='message', data=message)\n            yield ServerSentEvent(event='done', data={'status': 'complete'})\n    except Exception:\n        yield ServerSentEvent(event='error', data={'detail': FAILURE})\n\n# Mount last: API and Swagger routes take precedence. Lesson tabs need no\n# broad catch-all that could turn an unknown API route into an HTML success."
+  },
+  {
+    "number": 9,
+    "title": "Update typed state",
+    "source": "frontend/src/app/lab-state.ts",
+    "language": "typescript",
+    "text": "Append timestamped Angular signal state.",
+    "explanation": "Timeline rows stop at 500 while final result processing remains independent. Expand a row to inspect syntax-colored JSON.",
+    "code": "if (this.messages().length < 500)\n  this.messages.update((rows) => [\n    ...rows,\n    { ...message, elapsed: (performance.now() - started) / 1000 },\n  ]);\nif (\n  message.type === \"ResultMessage\" &&\n  isAgentResult(message.data)\n) {"
+  },
+  {
+    "number": 10,
+    "title": "ResultMessage fields",
+    "source": "backend/app/agent_service.py",
+    "language": "python",
+    "text": "Normalize final answer and metrics.",
+    "explanation": "The result contains text, turns, duration, estimated cost and is_error. A non-success subtype remains an error even when the SDK error flag is false.",
+    "code": "def result_data(self, message: ResultMessage) -> dict:\n    return {\n        'result': self.redact(message.result or '') if message.subtype == 'success' else 'The agent could not complete this prompt. Check the server configuration.',\n        'num_turns': message.num_turns,\n        'duration_ms': message.duration_ms,\n        'total_cost_usd': message.total_cost_usd,\n        'is_error': message.is_error or message.subtype != 'success',\n    }\n\nasync def run_agent(self, prompt: str) -> dict:"
+  },
+  {
+    "number": 11,
+    "title": "SSE ResultMessage",
+    "source": "frontend/src/app/api.ts",
+    "language": "typescript",
+    "text": "Validate and dispatch a final ResultMessage.",
+    "explanation": "Public contracts are runtime-checked before updating Angular. ResultMessage is a safe projection label shared by progress and final SSE events.",
+    "code": "      if (event === \"message\") {\n        const message = messageFrom(data);\n        if (message.type === \"ResultMessage\") finalReceived = true;\n        onMessage(message);\n      }\n    });\n    if (!completed || !finalReceived)\n      throw new Error(\n        \"The connection ended before the agent finished. Please try again.\",\n      );\n  },\n};"
+  },
+  {
+    "number": 12,
+    "title": "Render answer + metrics",
+    "source": "frontend/src/app/code.component.ts",
+    "language": "typescript",
+    "text": "Render safe Markdown and colored source code.",
+    "explanation": "Highlight.js escapes code. Answer rendering additionally runs DOMPurify, suppresses model images and restricts links to HTTP(S); Angular sanitizes innerHTML again.",
+    "code": "this.html = DOMPurify.sanitize(\n  marked.parse(this.text, { renderer, async: false }) as string,\n  {\n    FORBID_TAGS: [\n      \"script\",\n      \"style\",\n      \"iframe\",\n      \"img\",\n      \"video\",\n      \"audio\",\n      \"form\",\n    ],\n    FORBID_ATTR: [\"style\"],\n  },\n);"
+  },
+  {
+    "number": 13,
+    "title": "SSE done event",
+    "source": "frontend/src/app/api.ts",
+    "language": "typescript",
+    "text": "Require both final result and done.",
+    "explanation": "The incremental SSE parser handles split UTF-8 and CRLF, comments, multiline data and multiple frames. A done event cannot override an SDK error result.",
+    "code": "    if (event === \"done\") completed = true;\n    if (event === \"message\") {\n      const message = messageFrom(data);\n      if (message.type === \"ResultMessage\") finalReceived = true;\n      onMessage(message);\n    }\n  });\n  if (!completed || !finalReceived)\n    throw new Error(\n      \"The connection ended before the agent finished. Please try again.\",\n    );\n},"
+  },
+  {
+    "number": 14,
+    "title": "SSE error; no done",
+    "source": "backend/app/main.py",
+    "language": "python",
+    "text": "Emit a safe failure without a done event.",
+    "explanation": "Simple-mode failures return HTTP 502. Detailed provider exceptions and submitted values are excluded from public errors.",
+    "code": "        yield ServerSentEvent(event='error', data={'detail': FAILURE})\n\n# Mount last: API and Swagger routes take precedence. Lesson tabs need no"
+  },
+  {
+    "number": 15,
+    "title": "Error + snackbar",
+    "source": "frontend/src/app/lab-state.ts",
+    "language": "typescript",
+    "text": "Show an error and accessible Ionic notice.",
+    "explanation": "The same state drives inline errors and the app-wide toast. Finally clears timers and unlocks controls; cancel aborts the active fetch.",
+    "code": "} catch (error) {\n  const detail = active.signal.aborted\n    ? \"The request was canceled or timed out.\"\n    : error instanceof Error\n      ? error.message\n      : \"The request could not finish.\";\n  this.error.set(detail);\n  this.notice.set(detail);\n  this.status.set(\"error\");\n} finally {\n  clearInterval(timer);\n  clearTimeout(deadline);"
+  },
+  {
+    "number": 16,
+    "title": "Key: SSE error / input: 422",
+    "source": "backend/app/main.py",
+    "language": "python",
+    "text": "Reject missing credentials before SDK work.",
+    "explanation": "Simple mode returns HTTP 503; streaming emits error without done. Invalid JSON, media, body size, Origin and prompt constraints fail independently before inference.",
+    "code": "if not settings.api_key_configured:\n    raise HTTPException(503, MISSING_KEY)\ntry:\n    return await query_until_disconnected(request, agent, body.prompt)\nexcept HTTPException:"
+  }
+]
